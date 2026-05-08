@@ -185,7 +185,8 @@
             <div class="flex flex-col lg:flex-row items-center gap-12 max-w-6xl mx-auto">
                 <div class="lg:w-1/2 relative">
                     <div class="absolute -inset-4 bg-blue-100 rounded-[2.5rem] transform -rotate-3 z-0"></div>
-                    <img src="https://ndev-api.visitjeju.net/ptLettnfiledetail/real_path/202511/25/d67211d1-579a-4d6d-a671-c6a307eed8f6.webp" alt="Jeju Nature" class="relative z-10 rounded-[2rem] shadow-xl w-full object-cover h-[400px]">
+                    <!-- 이미지가 요청하신 URL로 변경되었습니다 -->
+                    <img src="https://i.ytimg.com/vi/4Q5res66LDg/maxresdefault.jpg" alt="Jeju Nature" class="relative z-10 rounded-[2rem] shadow-xl w-full object-cover h-[400px]">
                     <div class="absolute -bottom-6 -right-6 bg-white p-4 rounded-2xl shadow-lg z-20 font-bold text-teal-600 flex items-center gap-2">
                         <i class="fa-solid fa-book-open text-2xl"></i> 배움이 있는 섬, 제주
                     </div>
@@ -927,12 +928,41 @@
             evt.currentTarget.classList.remove('bg-white','text-slate-500','border-slate-200');
         }
 
+        function showToast(message) {
+            const msg = document.createElement('div');
+            msg.textContent = message;
+            msg.className = 'fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-5 py-2.5 rounded-full shadow-lg z-[9999] animate-fade-in-up text-sm font-bold';
+            document.body.appendChild(msg);
+            setTimeout(() => {
+                msg.style.opacity = '0';
+                msg.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => msg.remove(), 500);
+            }, 2000);
+        }
+
         function shareLink(){
             const url = window.location.href;
             if (navigator.share) {
                 navigator.share({ title: '[정선청소년수련관] 2026 제주 탐방 캠프', url }).catch(()=>{});
             } else {
-                navigator.clipboard?.writeText(url).then(()=>alert('링크가 복사되었습니다.'));
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(url).then(() => showToast('링크가 복사되었습니다.'));
+                } else {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = url;
+                    textArea.style.position = "absolute";
+                    textArea.style.left = "-999999px";
+                    document.body.prepend(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showToast('링크가 복사되었습니다.');
+                    } catch (error) {
+                        console.error(error);
+                    } finally {
+                        textArea.remove();
+                    }
+                }
             }
         }
 
